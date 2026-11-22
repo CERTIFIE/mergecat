@@ -43,7 +43,7 @@ claude plugin marketplace add /path/to/mergecat
 ```
 
 ```bash
-claude plugin install mergecat@mergecat-local
+claude plugin install mergecat@mergecat
 ```
 
 Then start Claude Code in any Git repository and run `/mergecat:tags` or
@@ -52,11 +52,11 @@ Then start Claude Code in any Git repository and run `/mergecat:tags` or
 To update an installed plugin after a rebuild:
 
 ```bash
-claude plugin marketplace update mergecat-local
+claude plugin marketplace update mergecat
 ```
 
 ```bash
-claude plugin update mergecat@mergecat-local
+claude plugin update mergecat@mergecat
 ```
 
 Then run `/reload-plugins` (or start a new session).

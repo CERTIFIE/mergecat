@@ -37,11 +37,11 @@ terminale:
 
 ```bash
 claude plugin marketplace add CERTIFIE/mergecat
-claude plugin install mergecat@mergecat-local
+claude plugin install mergecat@mergecat
 ```
 
 Poi riavvia Claude Code ed esegui `/mergecat:changelog` o `/mergecat:tags`. Per aggiornarlo:
-`claude plugin marketplace update mergecat-local` e `claude plugin update mergecat@mergecat-local`.
+`claude plugin marketplace update mergecat` e `claude plugin update mergecat@mergecat`.
 La cartella `plugins/mergecat` viene aggiornata automaticamente a ogni release stabile.
 
 ## Licenza

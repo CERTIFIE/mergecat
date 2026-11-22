@@ -1,0 +1,14 @@
+{
+  "name": "mergecat-local",
+  "owner": {
+    "name": "mergecat"
+  },
+  "plugins": [
+    {
+      "name": "mergecat",
+      "source": "./plugins/mergecat",
+      "description": "Tags and changelogs of any range (tags, dates or commits) from the changesets of a Git branch, as documents of the conversation: English/Markdown by default, other languages and PDF on request, EU AI Act / NIS2 compliance question once per session (mergecat MCP server + /mergecat:tags, /mergecat:changelog)."
+    }
+  ],
+  "description": "mergecat: changesets of a Git branch for Claude Code (local marketplace of this repository)."
+}

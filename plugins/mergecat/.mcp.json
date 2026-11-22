@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "mergecat": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/server/mergecat-mcp.cjs"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN:-}",
+        "GH_TOKEN": "${GH_TOKEN:-}",
+        "GITLAB_TOKEN": "${GITLAB_TOKEN:-}",
+        "GL_TOKEN": "${GL_TOKEN:-}",
+        "AZURE_DEVOPS_EXT_PAT": "${AZURE_DEVOPS_EXT_PAT:-}",
+        "AZURE_DEVOPS_TOKEN": "${AZURE_DEVOPS_TOKEN:-}",
+        "MERGECAT_GIT_PATH": "${MERGECAT_GIT_PATH:-}",
+        "MERGECAT_COMPLIANCE_DIR": "${MERGECAT_COMPLIANCE_DIR:-}"
+      }
+    }
+  }
+}

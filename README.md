@@ -30,6 +30,20 @@ Scarica l'ultima versione dalla pagina delle
 
 Istruzioni di installazione: [documentazione](https://certifie.github.io/mergecat/it/docs/installation/).
 
+### Plugin per Claude Code
+
+Questo repository è anche il marketplace del plugin. Serve Node.js 20 o successivo. In un
+terminale:
+
+```bash
+claude plugin marketplace add CERTIFIE/mergecat
+claude plugin install mergecat@mergecat
+```
+
+Poi riavvia Claude Code ed esegui `/mergecat:changelog` o `/mergecat:tags`. Per aggiornarlo:
+`claude plugin marketplace update mergecat` e `claude plugin update mergecat@mergecat`.
+La cartella `plugins/mergecat` viene aggiornata automaticamente a ogni release stabile.
+
 ## Licenza
 
 mergecat è un software **gratuito ma non open source**: il codice sorgente non è pubblico.

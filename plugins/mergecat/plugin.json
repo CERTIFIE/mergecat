@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "mergecat",
+  "version": "1.0.2",
+  "description": "Changesets of a Git branch for AI assistants (GitHub Copilot, OpenAI Codex, GitLab Duo, Claude Code): tags, and changelogs of any range (tags, dates or commits) as documents of the conversation, in English and Markdown by default or in another language and as PDF on request; asks the EU AI Act / NIS2 compliance question once per session and keeps an audit record.",
+  "author": {
+    "name": "mergecat"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "ai act",
+    "changelog",
+    "changeset",
+    "compliance",
+    "git",
+    "keep a changelog",
+    "nis2",
+    "pdf",
+    "release notes"
+  ]
+}

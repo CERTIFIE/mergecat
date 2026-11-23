@@ -61283,8 +61283,9 @@ var ProviderRateLimitError = class extends Error {
   }
 };
 var ProviderAccessError = class extends Error {
-  constructor(message) {
+  constructor(message, problem) {
     super(message);
+    this.problem = problem;
     this.name = "ProviderAccessError";
   }
 };
@@ -61666,7 +61667,7 @@ ${PR_FRAGMENT}`;
         signal,
         true
       );
-      if (!data.repository) throw this.repositoryNotFound();
+      if (!data.repository) throw await this.repositoryNotFound(signal);
       batch.forEach((sha, k) => {
         const node2 = data.repository?.[`c${k}`];
         const prs = node2?.associatedPullRequests.nodes ?? [];
@@ -61761,7 +61762,7 @@ ${PR_FRAGMENT}`;
         signal,
         true
       );
-      if (!data.repository) throw this.repositoryNotFound();
+      if (!data.repository) throw await this.repositoryNotFound(signal);
       const page = data.repository.pullRequests;
       result.push(...page.nodes.map((pr) => this.toSummary(pr)));
       if (!page.pageInfo.hasNextPage || !page.pageInfo.endCursor) break;
@@ -61788,7 +61789,7 @@ ${PR_FRAGMENT}`;
       signal,
       true
     );
-    if (!data.repository) throw this.repositoryNotFound();
+    if (!data.repository) throw await this.repositoryNotFound(signal);
     const pr = data.repository.pullRequest;
     if (!pr) throw new Error(`Pull request #${number4} not found in ${this.slug}.`);
     return {
@@ -61813,7 +61814,7 @@ ${PR_FRAGMENT}`;
       },
       signal
     });
-    if (!pull) throw this.repositoryNotFound();
+    if (!pull) throw await this.repositoryNotFound(signal);
     return {
       provider: "github",
       number: pull.number,
@@ -62028,7 +62029,7 @@ ${PR_FRAGMENT}`;
     if (blocking.length > 0 || !json3.data) {
       const message = blocking[0]?.message ?? errors[0]?.message ?? "Unexpected response from GitHub.";
       if (errors.some((e) => e.type === "NOT_FOUND" && e.path?.length === 1)) {
-        throw new ProviderAccessError(`Repository ${this.slug} not found on GitHub, or the account has no access to it.`);
+        throw await this.repositoryNotFound(signal);
       }
       if (blocking.some((e) => e.type === "FORBIDDEN")) throw new ProviderAccessError(`GitHub denied access: ${message}`);
       const scopes = blocking.find((e) => e.type === "INSUFFICIENT_SCOPES");
@@ -62078,7 +62079,8 @@ ${PR_FRAGMENT}`;
       if (sso) {
         const ssoUrl = /url=(\S+)/.exec(sso)?.[1];
         return new ProviderAccessError(
-          `The organisation that owns ${this.slug} requires SSO authorisation for this token.${ssoUrl ? ` Authorise it at ${ssoUrl}` : ""}`
+          `The organisation that owns ${this.slug} requires SSO authorisation for this token.${ssoUrl ? ` Authorise it at ${ssoUrl}` : ""}`,
+          { reason: "sso", repository: this.slug, owner: this.options.owner, url: ssoUrl }
         );
       }
       return new ProviderAccessError(body.message ? `${forbidden} (GitHub: ${body.message})` : forbidden);
@@ -62087,10 +62089,41 @@ ${PR_FRAGMENT}`;
     if (response.status === 422) return new Error(`GitHub rejected the request: ${body.details || body.message || "validation failed"}`);
     return new Error(`GitHub API error: HTTP ${response.status}${body.message ? ` (${body.message})` : ""}`);
   }
-  repositoryNotFound() {
-    return new ProviderAccessError(
-      `Repository ${this.slug} not found on GitHub, or the account has no access to it. For organisation repositories the organisation may need to approve the app or the token (SSO).`
+  /**
+   * The repository is not visible to the token. GraphQL says only "not found"; the REST API of the
+   * repository tells why when the organisation restricts OAuth apps or requires SSO, so ask it.
+   */
+  async repositoryNotFound(signal) {
+    const owner = this.options.owner;
+    const notFound = new ProviderAccessError(
+      `Repository ${this.slug} not found on GitHub, or the account has no access to it. For organisation repositories the organisation may need to approve the app or the token (SSO).`,
+      { reason: "repository-not-found", repository: this.slug, owner }
     );
+    try {
+      const url2 = `${this.apiUrl}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(this.options.repo)}`;
+      const response = await this.fetchImpl(url2, { headers: await this.headers({ "X-GitHub-Api-Version": "2022-11-28" }), signal });
+      if (response.status !== 403) return notFound;
+      const sso = response.headers.get("x-github-sso");
+      if (sso) {
+        const ssoUrl = /url=(\S+)/.exec(sso)?.[1];
+        return new ProviderAccessError(`The organisation ${owner} requires SSO authorisation for this token.${ssoUrl ? ` Authorise it at ${ssoUrl}` : ""}`, {
+          reason: "sso",
+          repository: this.slug,
+          owner,
+          url: ssoUrl
+        });
+      }
+      const body = await readErrorBody(response);
+      if (/OAuth App access restrictions/i.test(body.message)) {
+        return new ProviderAccessError(
+          `The organisation ${owner} restricts OAuth app access and has not approved this app. An owner of ${owner} must approve it on GitHub.`,
+          { reason: "oauth-app-restricted", repository: this.slug, owner }
+        );
+      }
+      return notFound;
+    } catch {
+      return notFound;
+    }
   }
 };
 var AREA_NAMES = {
@@ -65210,6 +65243,9 @@ async function buildRangeChangelog(repo, range, options = {}) {
   });
   return releases[0];
 }
+
+// ../core/src/quality/qualis.ts
+var DEFAULT_TIMEOUT_MS = 15 * 60 * 1e3;
 
 // src/server.ts
 var import_promises2 = require("node:fs/promises");

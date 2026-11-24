@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex" />
+    <title>mergecat · preview</title>
+    <script>
+      // Before anything loads: the colours of the website around the iframe, so the frame never flashes white.
+      try {
+        var dark = window.parent.document.documentElement.classList.contains('dark');
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        document.documentElement.style.background = dark ? '#14062d' : '#ffffff';
+      } catch (error) {
+        // Another origin: the browser colours stay.
+      }
+    </script>
+    <script type="module" crossorigin src="./assets/index-j3bp7SNt.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
